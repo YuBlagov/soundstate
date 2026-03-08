@@ -32,3 +32,11 @@
 .cardWrapper {
   position: absolute;
 }
+
+.centerCard {
+  position: absolute;
+  z-index: 10;
+  transform-origin: center;
+  scale: 1.3;
+}
+

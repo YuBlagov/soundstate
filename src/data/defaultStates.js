@@ -1,5 +1,5 @@
 export const defaultStates = [
-    {
+  {
     id: 1,
     name: 'DRIFT',
     color: '#7C9EB2',
