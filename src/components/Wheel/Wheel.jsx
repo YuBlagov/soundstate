@@ -1,5 +1,5 @@
 import StateCard from "../StateCard/StateCard";
-import ActiveState from "../ActiveState/ActiveState.module";
+import ActiveState from "../ActiveState/ActiveState";
 import styles from './Wheel.module.css';
 
 function Wheel({ states, activeId, onCardClick, rotation }) {
@@ -24,7 +24,7 @@ function Wheel({ states, activeId, onCardClick, rotation }) {
             style={{ transform: `rotate(${rotation}deg)` }}
         >
             {/* center - active state */}
-            <div style={{ transform: `rotate(${rotation}deg)`, 
+            <div style={{  
                 position: 'absolute', 
                 top: '50%',
                 left: '50%',

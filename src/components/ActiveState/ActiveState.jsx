@@ -6,7 +6,7 @@ function ActiveState({ activeState }) {
     return (
         <div
             className={styles.container}
-            style={{ '--activecolor': activeState.color }}>
+            style={{ '--active-color': activeState.color }}>
             <div className={styles.ring} />
             <div className={styles.inner}>
                 <span className={styles.name}>{activeState.name}</span>
