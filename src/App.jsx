@@ -1,6 +1,7 @@
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { defaultStates } from './data/defaultStates';
 import Wheel from './components/Wheel/Wheel';
+import StateForm from './components/StateForm/StateForm';
 import useAudioEngine from './hooks/useAudioEngine';
 import styles from './App.module.css';
 
@@ -8,6 +9,7 @@ function App() {
   const [states, setStates] = useState(defaultStates);
   const [activeId, setActiveId] = useState(1);
   const [rotation, setRotation] = useState(0);
+  const [showForm, setShowForm] = useState(false); 
 
   const activeState = states.find(state => state.id === activeId);
   useAudioEngine(activeState);
@@ -23,12 +25,25 @@ function App() {
   return (
     <div className="app">
       <h1>SOUNDSTATE</h1>
+
+      {/* show form button */}
+      <button onClick={() => setShowForm(true)}>+ Add State</button>
+
       <Wheel
         states={states}
         activeId={activeId}
         onCardClick={handleCardClick}
         rotation={rotation}
       />
+
+      {/* show form only when showForm = true */}
+      {showForm && (
+        <StateForm
+          initialData={null}
+          onCancel={() => setShowForm(false)}
+          onSubmit={() => setShowForm(false)}
+        />
+      )}
     </div>
   )
 }
