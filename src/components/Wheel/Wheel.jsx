@@ -2,7 +2,7 @@ import StateCard from "../StateCard/StateCard";
 import ActiveState from "../ActiveState/ActiveState";
 import styles from './Wheel.module.css';
 
-function Wheel({ states, activeId, onCardClick, rotation }) {
+function Wheel({ states, activeId, onCardClick, rotation, onEdit, onDelete }) {
     const activeState = states.find(state => state.id === activeId);
     const getCardStyle = (index) => {
         const total = states.length;
@@ -43,6 +43,8 @@ function Wheel({ states, activeId, onCardClick, rotation }) {
                     state={state}
                     isActive={state.id === activeId}
                     onClick={onCardClick}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
                 />
             </div>
         ))

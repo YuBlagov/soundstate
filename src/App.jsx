@@ -10,6 +10,7 @@ function App() {
   const [activeId, setActiveId] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [showForm, setShowForm] = useState(false); 
+  const [editState, setEditState] = useState(null);
 
   const activeState = states.find(state => state.id === activeId);
   useAudioEngine(activeState);
@@ -21,6 +22,32 @@ function App() {
     setRotation(angle);
     setActiveId(id);
   };
+
+  const handleAdd = (newStateData) => {
+    const newState = {
+      ...newStateData, // spread the new state data
+      id: Date.now(), // unique id
+    }
+    setStates([...states, newState]); 
+    setShowForm(false);
+  }
+
+  const handleEdit = (state) => {
+    setEditState(state);
+  }
+
+  const handleDelete = (id) => {
+    setStates(states.filter(state => state.id !== id));
+  }
+
+  const handleEditSubmit = (updatedData) => {
+    setStates(states.map(state => 
+      state.id === editState.id 
+      ? { ...state, ...updatedData, id: editState.id }
+      : state
+    ));
+    setEditState(null);
+  }
 
   return (
     <div className="app">
@@ -34,6 +61,8 @@ function App() {
         activeId={activeId}
         onCardClick={handleCardClick}
         rotation={rotation}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
 
       {/* show form only when showForm = true */}
@@ -41,7 +70,16 @@ function App() {
         <StateForm
           initialData={null}
           onCancel={() => setShowForm(false)}
-          onSubmit={() => setShowForm(false)}
+          onSubmit={handleAdd}
+        />
+      )}
+
+      {/* Edit Form */}
+      {editState && (
+        <StateForm
+          initialData={editState}
+          onCancel={() => setEditState(null)}
+          onSubmit={handleEditSubmit}
         />
       )}
     </div>
