@@ -54,7 +54,11 @@ function App() {
       <h1>SOUNDSTATE</h1>
 
       {/* show form button */}
-      <button onClick={() => setShowForm(true)}>+ Add State</button>
+      <button 
+        className={styles.addBtn}
+        onClick={() => setShowForm(true)}
+        > + 
+      </button>
 
       <Wheel
         states={states}
