@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>SOUNDSTATE</h1>
+      <h1 className={styles.title}>SOUNDSTATE</h1>
 
       {/* show form button */}
       <button 

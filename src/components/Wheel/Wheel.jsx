@@ -7,7 +7,7 @@ function Wheel({ states, activeId, onCardClick, rotation, onEdit, onDelete }) {
     const getCardStyle = (index) => {
         const total = states.length;
         const angle = (index / total) * 360 + 90;
-        const radius = 200;
+        const radius = window.innerWidth < 600 ? 125 : 240
 
         const x = Math.sin((angle * Math.PI) / 180) * radius;
         const y = -Math.cos((angle * Math.PI) / 180) * radius;

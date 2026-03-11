@@ -1,18 +1,22 @@
 .card {
   position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 16px;
+  width: 110px;
+  height: 110px;
+  border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
+.card:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+} 
 
 .active {
   transform: scale(1.1);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  filter: brightness(1.15); 
 }
 
 .name {
@@ -63,4 +67,16 @@
 
 .deleteBtn:hover {
   background: rgba(255, 0, 0, 0.6);
+}
+@media (max-width: 600px) {
+  .card {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+  }
+
+  .name {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
 }
