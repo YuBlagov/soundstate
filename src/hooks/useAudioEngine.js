@@ -27,100 +27,147 @@ function useAudioEngine(activeState) {
     }
 
     const playDrone = (ctx, sound) => {
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
+        // main oscillator
+        const oscillator1 = ctx.createOscillator();
+        const gainNode1 = ctx.createGain();
+        oscillator1.frequency.value = sound.frequency;
+        oscillator1.type = 'sine';
+        gainNode1.gain.value = 0.3;
+        oscillator1.connect(gainNode1);
+        gainNode1.connect(ctx.destination);
+        oscillator1.start();
 
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
+        // harmonic - octave above, quieter
+        const oscillator2 = ctx.createOscillator();
+        const gainNode2 = ctx.createGain();
+        oscillator2.frequency.value = sound.frequency * 1.5;
+        oscillator2.type = 'sine';
+        gainNode2.gain.value = 0.1;
+        oscillator2.connect(gainNode2);
+        gainNode2.connect(ctx.destination);
+        oscillator2.start();
 
-        oscillator.frequency.value = sound.frequency;
-        oscillator.type = 'sine';
-        gainNode.gain.value = 0.3;
+        // LFO - slowly changes volume (breathing effect)
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.frequency.value = sound.lfoSpeed;
+        lfoGain.gain.value = 0.15;
+        lfo.connect(lfoGain);
+        lfoGain.connect(gainNode1.gain);
+        lfo.start();
 
-        oscillator.start();
-        nodesRef.current.push(oscillator);
+        nodesRef.current.push(oscillator1, oscillator2, lfo);
     }
 
     const playRhythm = (ctx, sound) => {
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
+        const osc = ctx.createOscillator()
+        const gainNode = ctx.createGain()
+        const filter = ctx.createBiquadFilter()
 
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
+        // warm bass tone
+        osc.type = 'sine'
+        osc.frequency.value = sound.frequency * 0.5 // lower octave
+        gainNode.gain.value = 0
 
-        oscillator.frequency.value = sound.frequency;
-        oscillator.type = 'square';
-        gainNode.gain.value = 0;
+        // lowpass for warmth
+        filter.type = 'lowpass'
+        filter.frequency.value = 300
 
-        oscillator.start();
+        osc.connect(filter)
+        filter.connect(gainNode)
+        gainNode.connect(ctx.destination)
+        osc.start()
 
-        // rhythm through gainNode
         const interval = setInterval(() => {
-            const now = ctx.currentTime;
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.setValueAtTime(0, now + 0.1);
-        }, 1000 / sound.speed);
+            const now = ctx.currentTime
+            gainNode.gain.cancelScheduledValues(now)
+            gainNode.gain.setValueAtTime(0, now)
+            gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05)
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.4)
+        }, 1000 / sound.speed)
 
-        //save oscillator and cleanup function
-        nodesRef.current.push(oscillator);
-        nodesRef.current.push(() => clearInterval(interval));
-
-        return () => clearInterval(interval);
+        nodesRef.current.push(osc)
+        nodesRef.current.push(() => clearInterval(interval))
     }
 
     const playNoise = (ctx, sound) => {
-        const bufferSize = ctx.sampleRate * 2;
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
+        const bufferSize = ctx.sampleRate * 2
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+        const data = buffer.getChannelData(0)
 
         for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
+            data[i] = Math.random() * 2 - 1
         }
 
-        const source = ctx.createBufferSource();
-        const filter = ctx.createBiquadFilter();
-        const gainNode = ctx.createGain();
+        const source = ctx.createBufferSource()
+        const lowpass = ctx.createBiquadFilter()
+        const highpass = ctx.createBiquadFilter()
+        const gainNode = ctx.createGain()
 
-        source.buffer = buffer;
-        source.loop = true;
+        // lowpass removes harsh high frequencies
+        lowpass.type = 'lowpass'
+        lowpass.frequency.value = 400
 
-        filter.type = 'lowpass';
-        filter.frequency.value = sound.filterFreq;
+        // highpass removes low rumble
+        highpass.type = 'highpass'
+        highpass.frequency.value = 100
 
-        source.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(ctx.destination);
+        source.buffer = buffer
+        source.loop = true
 
-        gainNode.gain.value = 0.3;
-        source.start();
+        source.connect(highpass)
+        highpass.connect(lowpass)
+        lowpass.connect(gainNode)
+        gainNode.connect(ctx.destination)
 
-        nodesRef.current.push(source);
+        gainNode.gain.value = 0.2
+        source.start()
+
+        nodesRef.current.push(source)
     }
 
     const playStill = (ctx, sound) => {
-        const oscillator = ctx.createOscillator()
-        const gainNode = ctx.createGain()
+        // soft pad — three harmonics
+        const frequencies = [sound.frequency, sound.frequency * 2, sound.frequency * 3]
 
-        oscillator.connect(gainNode)
-        gainNode.connect(ctx.destination)
+        frequencies.forEach((freq, i) => {
+            const osc = ctx.createOscillator()
+            const gain = ctx.createGain()
 
-        oscillator.frequency.value = sound.frequency
-        oscillator.type = 'sine'
-        gainNode.gain.value = sound.volume
+            osc.type = 'sine'
+            osc.frequency.value = freq
+            gain.gain.value = 0.15 / (i + 1) // each harmonic quieter
 
-        oscillator.start()
-        nodesRef.current.push(oscillator)
+            osc.connect(gain)
+            gain.connect(ctx.destination)
+            osc.start()
+
+            nodesRef.current.push(osc)
+        })
     }
 
     const playEcho = (ctx, sound) => {
+        // main oscillator
         const oscillator = ctx.createOscillator()
         const gainNode = ctx.createGain()
+
+        // delay chain
         const delay = ctx.createDelay()
         const feedbackGain = ctx.createGain()
+        const filterNode = ctx.createBiquadFilter()
+
+        oscillator.frequency.value = sound.frequency
+        oscillator.type = 'sine'
+        gainNode.gain.value = 0.25
 
         delay.delayTime.value = sound.delayTime
-        feedbackGain.gain.value = 0.4
+        feedbackGain.gain.value = 0.8
 
+        // filter makes echo darker each repeat
+        filterNode.type = 'lowpass'
+        filterNode.frequency.value = 1200
+
+        // signal chain 
         oscillator.connect(gainNode)
         gainNode.connect(delay)
         gainNode.connect(ctx.destination)
@@ -128,12 +175,17 @@ function useAudioEngine(activeState) {
         feedbackGain.connect(delay)
         feedbackGain.connect(ctx.destination)
 
-        oscillator.frequency.value = sound.frequency
-        oscillator.type = 'sine'
-        gainNode.gain.value = 0.2
-
         oscillator.start()
         nodesRef.current.push(oscillator)
+        // disconnect all nodes on stop
+        nodesRef.current.push(() => {
+            oscillator.stop()
+            gainNode.disconnect()
+            delay.disconnect()
+            feedbackGain.disconnect()
+            filterNode.disconnect()
+        })
+
     }
 
     const playStatic = (ctx, sound) => {
@@ -141,20 +193,31 @@ function useAudioEngine(activeState) {
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
         const data = buffer.getChannelData(0)
 
+        // vinyl crackle — rare clicks in silence
         for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * sound.intensity
+            if (Math.random() < 0.001) {
+                data[i] = (Math.random() * 2 - 1) * sound.intensity
+            } else {
+                data[i] = (Math.random() * 2 - 1) * 0.003 // very quiet hiss
+            }
         }
 
         const source = ctx.createBufferSource()
         const gainNode = ctx.createGain()
+        const filter = ctx.createBiquadFilter()
+
+        filter.type = 'bandpass'
+        filter.frequency.value = 3000
+        filter.Q.value = 0.5
 
         source.buffer = buffer
         source.loop = true
 
-        source.connect(gainNode)
+        source.connect(filter)
+        filter.connect(gainNode)
         gainNode.connect(ctx.destination)
 
-        gainNode.gain.value = 0.4
+        gainNode.gain.value = 0.3
         source.start()
 
         nodesRef.current.push(source)

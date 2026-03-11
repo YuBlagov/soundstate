@@ -49,7 +49,7 @@ export const defaultStates = [
     sound: {
       type: 'echo',
       frequency: 200,
-      delayTime: 0.6,
+      delayTime: 0.5,
       reverb: 0.7,
     }
   },
@@ -59,7 +59,7 @@ export const defaultStates = [
     color: '#8B8B8B',
     sound: {
       type: 'static',
-      intensity: 0.6,
+      intensity: 0.3,
       reverb: 0.2,
     }
   },
