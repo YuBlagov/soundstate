@@ -79,4 +79,9 @@
     font-size: 10px;
     letter-spacing: 1px;
   }
+  .editBtn, .deleteBtn {
+    width: 18px;
+    height: 18px;
+    font-size: 8px;
+  }
 }

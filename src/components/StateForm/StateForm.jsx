@@ -5,6 +5,10 @@ function StateForm({ onSubmit, onCancel, initialData }) {
     const [name, setName] = useState(initialData?.name || '');
     const [color, setColor] = useState(initialData?.color || '#7C9EB2');
     const [soundType, setSoundType] = useState(initialData?.sound.type || 'drone');
+    const [frequency, setFrequency] = useState(initialData?.sound.frequency || 80);
+    const [volume, setVolume] = useState(initialData?.sound.volume || 0.3);
+    const [filterFrequency, setFilterFrequency] = useState(initialData?.sound.filterFrequency || 800);
+    const [lfoSpeed, setLfoSpeed] = useState(initialData?.sound.lfoSpeed || 0.5);
 
     const handleSubmit = () => {
         // basic validation
@@ -14,7 +18,13 @@ function StateForm({ onSubmit, onCancel, initialData }) {
         onSubmit({
             name: name.toUpperCase(),
             color,
-            sound: { type: soundType }
+            sound: {
+                type: soundType,
+                frequency,
+                volume,
+                filterFrequency,
+                lfoSpeed
+            }
         });
     }
     return (
@@ -62,6 +72,60 @@ function StateForm({ onSubmit, onCancel, initialData }) {
                         <option value="echo">Echo — repeating tone</option>
                         <option value="static">Static — interference</option>
                     </select>
+                </div>
+
+                {/* frequency */}
+                <div className={styles.field}>
+                    <label className={styles.label}>Frequency - {frequency} Hz</label>
+                    <input
+                        type="range"
+                        className={styles.slider}
+                        value={frequency}
+                        onChange={(e) => setFrequency(e.target.value)}
+                        min={40}
+                        max={400}
+                    />
+                </div>
+
+                {/* volume */}
+                <div className={styles.field}>
+                    <label className={styles.label}>Volume - {Math.round(volume * 100)}%</label>
+                    <input
+                        type="range"
+                        className={styles.slider}
+                        value={volume}
+                        onChange={(e) => setVolume(e.target.value)}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                    />
+                </div>
+
+                {/* filter */}
+                <div className={styles.field}>
+                    <label className={styles.label}>Tone - {filterFrequency} Hz</label>
+                    <input
+                        type="range"
+                        className={styles.slider}
+                        value={filterFrequency}
+                        onChange={(e) => setFilterFrequency(Number(e.target.value))}
+                        min={200}
+                        max={4000}
+                    />
+                </div>
+
+                {/* lfo */}
+                <div className={styles.field}>
+                    <label className={styles.label}>Breathing - {lfoSpeed}</label>
+                    <input
+                        type="range"
+                        className={styles.slider}
+                        value={lfoSpeed}
+                        onChange={(e) => setLfoSpeed(Number(e.target.value))}
+                        min={0}
+                        max={2}
+                        step={0.1}
+                    />
                 </div>
 
                 {/* actions */}

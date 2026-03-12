@@ -27,34 +27,45 @@ function useAudioEngine(activeState) {
     }
 
     const playDrone = (ctx, sound) => {
+        const filter = ctx.createBiquadFilter();
         // main oscillator
         const oscillator1 = ctx.createOscillator();
         const gainNode1 = ctx.createGain();
-        oscillator1.frequency.value = sound.frequency;
+        oscillator1.frequency.value = sound.frequency || 60;
         oscillator1.type = 'sine';
-        gainNode1.gain.value = 0.3;
+        gainNode1.gain.value = sound.volume || 0.3;
         oscillator1.connect(gainNode1);
-        gainNode1.connect(ctx.destination);
-        oscillator1.start();
+        //gainNode1.connect(ctx.destination);
+        //oscillator1.start();
 
         // harmonic - octave above, quieter
         const oscillator2 = ctx.createOscillator();
         const gainNode2 = ctx.createGain();
-        oscillator2.frequency.value = sound.frequency * 1.5;
+        oscillator2.frequency.value = (sound.frequency || 60) * 1.5;
         oscillator2.type = 'sine';
-        gainNode2.gain.value = 0.1;
+        gainNode2.gain.value = (sound.volume || 0.3) * 0.3;
         oscillator2.connect(gainNode2);
-        gainNode2.connect(ctx.destination);
-        oscillator2.start();
+        //gainNode2.connect(ctx.destination);
+        //oscillator2.start();
 
         // LFO - slowly changes volume (breathing effect)
         const lfo = ctx.createOscillator();
         const lfoGain = ctx.createGain();
-        lfo.frequency.value = sound.lfoSpeed;
+        lfo.frequency.value = sound.lfoSpeed || 0.1;
         lfoGain.gain.value = 0.15;
         lfo.connect(lfoGain);
         lfoGain.connect(gainNode1.gain);
         lfo.start();
+
+        // universal filter
+        filter.type = 'lowpass';
+        filter.frequency.value = sound.filterFreq || 800;
+        gainNode1.connect(filter);
+        gainNode2.connect(filter);
+        filter.connect(ctx.destination);
+
+        oscillator1.start();
+        oscillator2.start();
 
         nodesRef.current.push(oscillator1, oscillator2, lfo);
     }
@@ -63,30 +74,39 @@ function useAudioEngine(activeState) {
         const osc = ctx.createOscillator()
         const gainNode = ctx.createGain()
         const filter = ctx.createBiquadFilter()
+        const lfo = ctx.createOscillator()
+        const lfoGain = ctx.createGain()
 
         // warm bass tone
         osc.type = 'sine'
-        osc.frequency.value = sound.frequency * 0.5 // lower octave
+        osc.frequency.value = (sound.frequency || 120) * 0.5 // lower octave
         gainNode.gain.value = 0
 
         // lowpass for warmth
         filter.type = 'lowpass'
-        filter.frequency.value = 300
+        filter.frequency.value = sound.filterFreq || 300
+
+        // lfo modulates filter frequency — breathing effect on rhythm
+        lfo.frequency.value = sound.lfoSpeed || 0.5
+        lfoGain.gain.value = 200
+        lfo.connect(lfoGain)
+        lfoGain.connect(filter.frequency)
 
         osc.connect(filter)
         filter.connect(gainNode)
         gainNode.connect(ctx.destination)
         osc.start()
+        lfo.start()
 
         const interval = setInterval(() => {
             const now = ctx.currentTime
             gainNode.gain.cancelScheduledValues(now)
             gainNode.gain.setValueAtTime(0, now)
-            gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05)
+            gainNode.gain.linearRampToValueAtTime(sound.volume || 0.4, now + 0.05)
             gainNode.gain.linearRampToValueAtTime(0, now + 0.4)
-        }, 1000 / sound.speed)
+        }, 1000 / (sound.speed || 1.2))
 
-        nodesRef.current.push(osc)
+        nodesRef.current.push(osc, lfo)
         nodesRef.current.push(() => clearInterval(interval))
     }
 
@@ -106,7 +126,7 @@ function useAudioEngine(activeState) {
 
         // lowpass removes harsh high frequencies
         lowpass.type = 'lowpass'
-        lowpass.frequency.value = 400
+        lowpass.frequency.value = sound.filterFreq || 400
 
         // highpass removes low rumble
         highpass.type = 'highpass'
@@ -120,7 +140,7 @@ function useAudioEngine(activeState) {
         lowpass.connect(gainNode)
         gainNode.connect(ctx.destination)
 
-        gainNode.gain.value = 0.2
+        gainNode.gain.value = sound.volume || 0.2
         source.start()
 
         nodesRef.current.push(source)
@@ -128,7 +148,28 @@ function useAudioEngine(activeState) {
 
     const playStill = (ctx, sound) => {
         // soft pad — three harmonics
-        const frequencies = [sound.frequency, sound.frequency * 2, sound.frequency * 3]
+        const frequencies = [
+            sound.frequency || 40,
+            (sound.frequency || 40) * 2,
+            (sound.frequency || 40) * 3
+        ]
+
+        const filter = ctx.createBiquadFilter()
+        const masterGain = ctx.createGain()
+        const lfo = ctx.createOscillator()
+        const lfoGain = ctx.createGain()
+
+        filter.type = 'lowpass'
+        filter.frequency.value = sound.filterFreq || 800
+        filter.connect(masterGain)
+        masterGain.connect(ctx.destination)
+
+        // lfo breathes the volume
+        lfo.frequency.value = sound.lfoSpeed || 0.3
+        lfoGain.gain.value = 0.1
+        lfo.connect(lfoGain)
+        lfoGain.connect(masterGain.gain)
+        lfo.start()
 
         frequencies.forEach((freq, i) => {
             const osc = ctx.createOscillator()
@@ -136,14 +177,15 @@ function useAudioEngine(activeState) {
 
             osc.type = 'sine'
             osc.frequency.value = freq
-            gain.gain.value = 0.15 / (i + 1) // each harmonic quieter
+            gain.gain.value = (sound.volume || 0.15) / (i + 1) // each harmonic quieter
 
             osc.connect(gain)
-            gain.connect(ctx.destination)
+            gain.connect(filter)
             osc.start()
 
             nodesRef.current.push(osc)
         })
+        nodesRef.current.push(lfo)
     }
 
     const playEcho = (ctx, sound) => {
@@ -156,22 +198,23 @@ function useAudioEngine(activeState) {
         const feedbackGain = ctx.createGain()
         const filterNode = ctx.createBiquadFilter()
 
-        oscillator.frequency.value = sound.frequency
+        oscillator.frequency.value = sound.frequency || 200
         oscillator.type = 'sine'
-        gainNode.gain.value = 0.25
+        gainNode.gain.value = sound.volume || 0.25
 
-        delay.delayTime.value = sound.delayTime
+        delay.delayTime.value = sound.delayTime || 0.6
         feedbackGain.gain.value = 0.8
 
         // filter makes echo darker each repeat
         filterNode.type = 'lowpass'
-        filterNode.frequency.value = 1200
+        filterNode.frequency.value = sound.filterFreq || 1200
 
         // signal chain 
         oscillator.connect(gainNode)
         gainNode.connect(delay)
         gainNode.connect(ctx.destination)
-        delay.connect(feedbackGain)
+        delay.connect(filterNode)
+        filterNode.connect(feedbackGain)
         feedbackGain.connect(delay)
         feedbackGain.connect(ctx.destination)
 
@@ -196,7 +239,7 @@ function useAudioEngine(activeState) {
         // vinyl crackle — rare clicks in silence
         for (let i = 0; i < bufferSize; i++) {
             if (Math.random() < 0.001) {
-                data[i] = (Math.random() * 2 - 1) * sound.intensity
+                data[i] = (Math.random() * 2 - 1) * (sound.intensity || 0.3)
             } else {
                 data[i] = (Math.random() * 2 - 1) * 0.003 // very quiet hiss
             }
@@ -207,7 +250,7 @@ function useAudioEngine(activeState) {
         const filter = ctx.createBiquadFilter()
 
         filter.type = 'bandpass'
-        filter.frequency.value = 3000
+        filter.frequency.value = sound.filterFreq || 3000
         filter.Q.value = 0.5
 
         source.buffer = buffer
@@ -217,7 +260,7 @@ function useAudioEngine(activeState) {
         filter.connect(gainNode)
         gainNode.connect(ctx.destination)
 
-        gainNode.gain.value = 0.3
+        gainNode.gain.value = sound.volume || 0.3
         source.start()
 
         nodesRef.current.push(source)
