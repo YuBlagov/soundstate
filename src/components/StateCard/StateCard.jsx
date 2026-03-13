@@ -5,7 +5,9 @@ function StateCard({ state, isActive, onClick, onEdit, onDelete }) {
     <div
       className={`${styles.card} ${isActive ? styles.active : ''}`}
       onClick={() => onClick(state.id)}
-      style={{ backgroundColor: state.color }}
+      style={{ backgroundColor: state.color,
+        '--card-color': state.color
+       }}
     >
       <span className={styles.name}>{state.name}</span>
 
