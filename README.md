@@ -1,16 +1,44 @@
-# React + Vite
+# SOUNDSTATE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A generative audio app built with React. Create and mix ambient sound states — each card generates a unique sound using the Web Audio API.
 
-Currently, two official plugins are available:
+🔗 [Live Demo](https://soundstate.netlify.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Sound States
 
-## React Compiler
+| State | Type | Description |
+|-------|------|-------------|
+| DRIFT | Drone | Slow ambient hum with breathing LFO |
+| PULSE | Rhythm | Deep bass pulse with filter sweep |
+| NOISE | Noise | Ocean-like filtered white noise |
+| STILL | Pad | Soft harmonic pad with three overtones |
+| ECHO | Echo | Melodic tone with delay feedback loop |
+| STATIC | Static | Vinyl crackle and quiet hiss |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Sound Parameters
 
-## Expanding the ESLint configuration
+Each card can be customized with:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Frequency** — pitch of the tone (40–400Hz)
+- **Volume** — loudness (0–100%)
+- **Tone** — brightness via lowpass filter (200–4000Hz)
+- **Breathing** — LFO speed, modulates volume or filter (0–2Hz)
+
+## Features
+
+- Add, edit, and delete sound states
+- Real-time sound preview when editing parameters
+- Rotating wheel UI with smooth animations
+- Fully responsive — works on mobile
+
+## Built With
+
+- React + Vite
+- Web Audio API — no external audio libraries
+- CSS Modules
+
+## Run Locally
+```bash
+npm install
+npm run dev
+```
