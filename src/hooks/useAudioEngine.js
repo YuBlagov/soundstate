@@ -222,7 +222,6 @@ function useAudioEngine(activeState) {
         nodesRef.current.push(oscillator)
         // disconnect all nodes on stop
         nodesRef.current.push(() => {
-            oscillator.stop()
             gainNode.disconnect()
             delay.disconnect()
             feedbackGain.disconnect()

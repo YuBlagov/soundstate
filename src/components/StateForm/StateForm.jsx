@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import useAudioEngine from '../../hooks/useAudioEngine';
 import styles from './StateForm.module.css';
 
 function StateForm({ onSubmit, onCancel, initialData }) {
@@ -9,6 +10,19 @@ function StateForm({ onSubmit, onCancel, initialData }) {
     const [volume, setVolume] = useState(initialData?.sound.volume || 0.3);
     const [filterFrequency, setFilterFrequency] = useState(initialData?.sound.filterFrequency || 800);
     const [lfoSpeed, setLfoSpeed] = useState(initialData?.sound.lfoSpeed || 0.5);
+    const previewState = {
+        id: 'preview', 
+        name: name,
+        color: color,
+        sound: {
+            type: soundType,
+            frequency,
+            volume,
+            filterFreq: filterFrequency,
+            lfoSpeed
+        }
+    }
+    useAudioEngine(previewState);
 
     const handleSubmit = () => {
         // basic validation
@@ -22,7 +36,7 @@ function StateForm({ onSubmit, onCancel, initialData }) {
                 type: soundType,
                 frequency,
                 volume,
-                filterFrequency,
+                filterFreq: filterFrequency,
                 lfoSpeed
             }
         });
@@ -81,7 +95,7 @@ function StateForm({ onSubmit, onCancel, initialData }) {
                         type="range"
                         className={styles.slider}
                         value={frequency}
-                        onChange={(e) => setFrequency(e.target.value)}
+                        onChange={(e) => setFrequency(Number(e.target.value))}
                         min={40}
                         max={400}
                     />
@@ -94,7 +108,7 @@ function StateForm({ onSubmit, onCancel, initialData }) {
                         type="range"
                         className={styles.slider}
                         value={volume}
-                        onChange={(e) => setVolume(e.target.value)}
+                        onChange={(e) => setVolume(Number(e.target.value))}
                         min={0}
                         max={1}
                         step={0.01}
