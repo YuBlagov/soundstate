@@ -5,9 +5,11 @@ export const defaultStates = [
     color: '#7C9EB2',
     sound: {
       type: 'drone',
-      frequency: 60,
+      frequency: 50,
       lfoSpeed: 0.1,
-      reverb: 0.8,
+      volume: 0.3,
+      filterFreq: 400,
+      lfoSpeed: 0.1,
     }
   },
   {
@@ -16,9 +18,11 @@ export const defaultStates = [
     color: '#E8865A',
     sound: {
       type: 'rhythm',
-      frequency: 120,
+      frequency: 100,
+      lfoSpeed: 0.5,
+      filterFreq: 300,
+      volume: 0.4,
       speed: 1.2,
-      reverb: 0.3,
     }
   },
   {
@@ -27,8 +31,9 @@ export const defaultStates = [
     color: '#A8B5A2',
     sound: {
       type: 'noise',
-      filterFreq: 800,
-      reverb: 0.5,
+      frequency: 200,
+      filterFreq: 350,
+      volume: 0.1
     }
   },
   {
@@ -37,9 +42,10 @@ export const defaultStates = [
     color: '#C4B8D4',
     sound: {
       type: 'silence',
-      frequency: 40,
-      volume: 0.05,
-      reverb: 0.9,
+      frequency: 60,
+      volume: 0.15,
+      filterFreq: 800,
+      lfoSpeed: 0.3
     }
   },
   {
@@ -48,9 +54,10 @@ export const defaultStates = [
     color: '#89B4A8',
     sound: {
       type: 'echo',
-      frequency: 200,
-      delayTime: 0.5,
-      reverb: 0.7,
+      frequency: 150,
+      volume: 0.2,
+      filterFreq: 800,
+      delayTime: 0.6
     }
   },
   {
@@ -60,7 +67,8 @@ export const defaultStates = [
     sound: {
       type: 'static',
       intensity: 0.3,
-      reverb: 0.2,
+      volume: 0.3,
+      filterFreq: 3000
     }
   },
 ]

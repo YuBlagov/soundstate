@@ -13,7 +13,8 @@ function App() {
   const [editState, setEditState] = useState(null);
 
   const activeState = states.find(state => state.id === activeId);
-  useAudioEngine(activeState);
+  const audioState = (showForm || editState) ? null : activeState;
+  useAudioEngine(audioState);
 
   const handleCardClick = (id) => {
     const total = states.length;

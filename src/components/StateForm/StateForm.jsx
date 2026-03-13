@@ -8,7 +8,7 @@ function StateForm({ onSubmit, onCancel, initialData }) {
     const [soundType, setSoundType] = useState(initialData?.sound.type || 'drone');
     const [frequency, setFrequency] = useState(initialData?.sound.frequency || 80);
     const [volume, setVolume] = useState(initialData?.sound.volume || 0.3);
-    const [filterFrequency, setFilterFrequency] = useState(initialData?.sound.filterFrequency || 800);
+    const [filterFrequency, setFilterFrequency] = useState(initialData?.sound.filterFreq || 800);
     const [lfoSpeed, setLfoSpeed] = useState(initialData?.sound.lfoSpeed || 0.5);
     const previewState = {
         id: 'preview', 
