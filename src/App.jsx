@@ -30,6 +30,7 @@ function App() {
       id: Date.now(), // unique id
     }
     setStates([...states, newState]); 
+    setActiveId(newState.id); // set new state as active
     setShowForm(false);
   }
 
@@ -38,7 +39,13 @@ function App() {
   }
 
   const handleDelete = (id) => {
-    setStates(states.filter(state => state.id !== id));
+    const newStates = states.filter(state => state.id !== id);
+    setStates(newStates);
+
+    //if deleted card was active - switch to the first card
+    if (activeId === id) {
+      setActiveId(newStates[0]?.id || null);
+    }
   }
 
   const handleEditSubmit = (updatedData) => {

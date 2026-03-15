@@ -9,7 +9,6 @@ export const defaultStates = [
       lfoSpeed: 0.1,
       volume: 0.3,
       filterFreq: 400,
-      lfoSpeed: 0.1,
     }
   },
   {
