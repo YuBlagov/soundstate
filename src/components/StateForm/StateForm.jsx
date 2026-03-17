@@ -22,7 +22,7 @@ function StateForm({ onSubmit, onCancel, initialData }) {
             lfoSpeed
         }
     }
-    useAudioEngine(previewState);
+    useAudioEngine([previewState]);
 
     const handleSubmit = () => {
         // basic validation

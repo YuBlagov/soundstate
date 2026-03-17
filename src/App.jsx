@@ -7,21 +7,31 @@ import styles from './App.module.css';
 
 function App() {
   const [states, setStates] = useState(defaultStates);
-  const [activeId, setActiveId] = useState(1);
+  const [activeIds, setActiveIds] = useState([1]);
   const [rotation, setRotation] = useState(0);
-  const [showForm, setShowForm] = useState(false); 
+  const [showForm, setShowForm] = useState(false);
   const [editState, setEditState] = useState(null);
 
-  const activeState = states.find(state => state.id === activeId);
-  const audioState = (showForm || editState) ? null : activeState;
-  useAudioEngine(audioState);
+  const activeStates = states.filter(state => activeIds.includes(state.id));
+  const audioStates = (showForm || editState) ? [] : activeStates
+  useAudioEngine(audioStates);
 
   const handleCardClick = (id) => {
-    const total = states.length;
-    const index = states.findIndex((state) => state.id === id);
-    const angle = -(index / total) * 360;
+    const index = states.findIndex(state => state.id === id);
+    const angle = -(index / states.length) * 360;
     setRotation(angle);
-    setActiveId(id);
+    setActiveIds(prev => {
+      if (prev.includes(id)) {
+        if (prev.length === 1) return prev; // min 1 active state
+        return prev.filter(i => i !== id);
+      }
+      // if 2 already active - replace oldest
+      if (prev.length >= 2) {
+        return [prev[1], id]
+      }
+      // add to active
+      return [...prev, id];
+    })
   };
 
   const handleAdd = (newStateData) => {
@@ -29,8 +39,8 @@ function App() {
       ...newStateData, // spread the new state data
       id: Date.now(), // unique id
     }
-    setStates([...states, newState]); 
-    setActiveId(newState.id); // set new state as active
+    setStates([...states, newState]);
+    setActiveIds([newState.id]); // set new state as active
     setShowForm(false);
   }
 
@@ -43,16 +53,16 @@ function App() {
     setStates(newStates);
 
     //if deleted card was active - switch to the first card
-    if (activeId === id) {
-      setActiveId(newStates[0]?.id || null);
+    if (activeIds.includes(id)) {
+      setActiveIds(newStates[0]?.id.filter(Boolean));
     }
   }
 
   const handleEditSubmit = (updatedData) => {
-    setStates(states.map(state => 
-      state.id === editState.id 
-      ? { ...state, ...updatedData, id: editState.id }
-      : state
+    setStates(states.map(state =>
+      state.id === editState.id
+        ? { ...state, ...updatedData, id: editState.id }
+        : state
     ));
     setEditState(null);
   }
@@ -62,15 +72,15 @@ function App() {
       <h1 className={styles.title}>SOUNDSTATE</h1>
 
       {/* show form button */}
-      <button 
+      <button
         className={styles.addBtn}
         onClick={() => setShowForm(true)}
-        > + 
+      > +
       </button>
 
       <Wheel
         states={states}
-        activeId={activeId}
+        activeIds={activeIds}
         onCardClick={handleCardClick}
         rotation={rotation}
         onEdit={handleEdit}

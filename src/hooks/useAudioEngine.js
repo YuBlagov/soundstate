@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 
-function useAudioEngine(activeState) {
+function useAudioEngine(activeStates) {
     const audioCtxRef = useRef(null);
     const nodesRef = useRef([]);
 
@@ -266,35 +266,40 @@ function useAudioEngine(activeState) {
     }
 
     useEffect(() => {
-        if (!activeState) return
+        if (!activeStates || activeStates.length === 0) {
+            stopAll();
+            return;
+        }
         stopAll();
         const ctx = getAudioContext();
         ctx.resume();
 
-        switch (activeState.sound.type) {
-            case 'drone':
-                playDrone(ctx, activeState.sound);
-                break;
-            case 'rhythm':
-                playRhythm(ctx, activeState.sound);
-                break;
-            case 'noise':
-                playNoise(ctx, activeState.sound);
-                break;
-            case 'silence':
-                playStill(ctx, activeState.sound);
-                break;
-            case 'echo':
-                playEcho(ctx, activeState.sound);
-                break;
-            case 'static':
-                playStatic(ctx, activeState.sound);
-                break;
-        }
+        //play each active state
+        activeStates.forEach(state => {
+            switch (state.sound.type) {
+                case 'drone':
+                    playDrone(ctx, state.sound);
+                    break;
+                case 'rhythm':
+                    playRhythm(ctx, state.sound);
+                    break;
+                case 'noise':
+                    playNoise(ctx, state.sound);
+                    break;
+                case 'silence':
+                    playStill(ctx, state.sound);
+                    break;
+                case 'echo':
+                    playEcho(ctx, state.sound);
+                    break;
+                case 'static':
+                    playStatic(ctx, state.sound);
+                    break;
+            }
+        })
+        return () => stopAll()
+    }, [activeStates])
 
-        return () =>
-            stopAll();
-    }, [activeState])
 }
 
 export default useAudioEngine;

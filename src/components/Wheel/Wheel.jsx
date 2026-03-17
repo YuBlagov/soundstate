@@ -2,8 +2,8 @@ import StateCard from "../StateCard/StateCard";
 import ActiveState from "../ActiveState/ActiveState";
 import styles from './Wheel.module.css';
 
-function Wheel({ states, activeId, onCardClick, rotation, onEdit, onDelete }) {
-    const activeState = states.find(state => state.id === activeId);
+function Wheel({ states, activeIds, onCardClick, rotation, onEdit, onDelete }) {
+    const activeStates = states.filter(state => activeIds.includes(state.id));
     const getCardStyle = (index) => {
         const total = states.length;
         const angle = (index / total) * 360 + 90;
@@ -30,7 +30,7 @@ function Wheel({ states, activeId, onCardClick, rotation, onEdit, onDelete }) {
                 left: '50%',
                 transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
                 zIndex: 10 }}>
-                <ActiveState activeState={activeState} />
+                <ActiveState activeStates={activeStates} />
             </div>
             {/* 6 cards around */}
             {states.map((state, index) => (
@@ -41,7 +41,7 @@ function Wheel({ states, activeId, onCardClick, rotation, onEdit, onDelete }) {
             >
                 <StateCard
                     state={state}
-                    isActive={state.id === activeId}
+                    isActive={activeIds.includes(state.id)} // array
                     onClick={onCardClick}
                     onEdit={onEdit}
                     onDelete={onDelete}
