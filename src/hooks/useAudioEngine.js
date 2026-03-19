@@ -3,6 +3,7 @@ import { useRef, useEffect } from 'react';
 function useAudioEngine(activeState) {
     const audioCtxRef = useRef(null);
     const nodesRef = useRef([]);
+    const analyserRef = useRef(null);
 
     const stopAll = () => {
         nodesRef.current.forEach(node => {
@@ -22,6 +23,10 @@ function useAudioEngine(activeState) {
     const getAudioContext = () => {
         if (!audioCtxRef.current) {
             audioCtxRef.current = new AudioContext();
+            // create analyser once
+            analyserRef.current = audioCtxRef.current.createAnalyser();
+            analyserRef.current.fftSize = 256;
+            analyserRef.current.connect(audioCtxRef.current.destination);
         }
         return audioCtxRef.current;
     }
@@ -62,7 +67,7 @@ function useAudioEngine(activeState) {
         filter.frequency.value = sound.filterFreq || 800;
         gainNode1.connect(filter);
         gainNode2.connect(filter);
-        filter.connect(ctx.destination);
+        filter.connect(analyserRef.current);
 
         oscillator1.start();
         oscillator2.start();
@@ -94,7 +99,7 @@ function useAudioEngine(activeState) {
 
         osc.connect(filter)
         filter.connect(gainNode)
-        gainNode.connect(ctx.destination)
+        gainNode.connect(analyserRef.current)
         osc.start()
         lfo.start()
 
@@ -138,7 +143,7 @@ function useAudioEngine(activeState) {
         source.connect(highpass)
         highpass.connect(lowpass)
         lowpass.connect(gainNode)
-        gainNode.connect(ctx.destination)
+        gainNode.connect(analyserRef.current)
 
         gainNode.gain.value = sound.volume || 0.2
         source.start()
@@ -162,7 +167,7 @@ function useAudioEngine(activeState) {
         filter.type = 'lowpass'
         filter.frequency.value = sound.filterFreq || 800
         filter.connect(masterGain)
-        masterGain.connect(ctx.destination)
+        masterGain.connect(analyserRef.current)
 
         // lfo breathes the volume
         lfo.frequency.value = sound.lfoSpeed || 0.3
@@ -212,11 +217,11 @@ function useAudioEngine(activeState) {
         // signal chain 
         oscillator.connect(gainNode)
         gainNode.connect(delay)
-        gainNode.connect(ctx.destination)
+        gainNode.connect(analyserRef.current)
         delay.connect(filterNode)
         filterNode.connect(feedbackGain)
         feedbackGain.connect(delay)
-        feedbackGain.connect(ctx.destination)
+        feedbackGain.connect(analyserRef.current)
 
         oscillator.start()
         nodesRef.current.push(oscillator)
@@ -257,7 +262,7 @@ function useAudioEngine(activeState) {
 
         source.connect(filter)
         filter.connect(gainNode)
-        gainNode.connect(ctx.destination)
+        gainNode.connect(analyserRef.current)
 
         gainNode.gain.value = sound.volume || 0.3
         source.start()
@@ -295,6 +300,8 @@ function useAudioEngine(activeState) {
         return () =>
             stopAll();
     }, [activeState])
+
+    return analyserRef; // return analyser for visualization
 }
 
 export default useAudioEngine;

@@ -14,7 +14,8 @@ function App() {
 
   const activeState = states.find(state => state.id === activeId);
   const audioState = (showForm || editState) ? null : activeState;
-  useAudioEngine(audioState);
+
+  const analyser = useAudioEngine(audioState);
 
   const handleCardClick = (id) => {
     const total = states.length;
@@ -63,11 +64,12 @@ function App() {
 
       <Wheel
         states={states}
-        activeId={activeId}
+        activeIds={[activeId]}
         onCardClick={handleCardClick}
         rotation={rotation}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        analyser={analyser}
       />
 
       {/* show form only when showForm = true */}
