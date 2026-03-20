@@ -3,7 +3,7 @@ import ActiveState from "../ActiveState/ActiveState";
 import Visualizer from "../Visualizer/Visualizer";
 import styles from './Wheel.module.css';
 
-function Wheel({ states, activeIds, onCardClick, rotation, onEdit, onDelete, analyser }) {
+function Wheel({ states, activeIds, onCardClick, rotation, onEdit, onDelete, analyser, isPaused, onPause }) {
     const activeStates = states.filter(state => activeIds.includes(state.id));
     const getCardStyle = (index) => {
         const total = states.length;
@@ -43,9 +43,11 @@ function Wheel({ states, activeIds, onCardClick, rotation, onEdit, onDelete, ana
                 transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
                 zIndex: 10
             }}>
-                <ActiveState 
-                    activeStates={activeStates} 
-                    isPlaying={!!analyser?.current} />
+                <ActiveState
+                    activeStates={activeStates}
+                    isPlaying={!!analyser?.current && !isPaused}
+                    onPause={onPause}
+                    isPaused={isPaused} />
             </div>
             {/* 6 cards around */}
             {states.map((state, index) => (

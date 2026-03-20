@@ -13,6 +13,7 @@ function App() {
   const [rotation, setRotation] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editState, setEditState] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const loadStates = async () => {
@@ -28,8 +29,9 @@ function App() {
     }
     loadStates()
   }, [])
+
   const activeStates = states.filter(state => activeIds.includes(state.id))
-  const audioState = (showForm || editState) ? null : activeStates[0]
+  const audioState = (showForm || editState || isPaused) ? null : activeStates[0]
 
   const analyser = useAudioEngine(audioState);
 
@@ -39,6 +41,7 @@ function App() {
     const angle = -(index / total) * 360;
     setRotation(angle);
     setActiveIds([id]);
+    setIsPaused(false);
   };
 
   const handleAdd = (newStateData) => {
@@ -81,7 +84,7 @@ function App() {
       <button className={styles.retryBtn} onClick={() => window.location.reload()}>Retry</button>
     </div>
   )
-  
+
   return (
     <div className="app">
       <h1 className={styles.title}>SOUNDSTATE</h1>
@@ -102,6 +105,8 @@ function App() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         analyser={analyser}
+        isPaused={isPaused}
+        onPause={() => setIsPaused(p => !p)}
       />
 
       {/* show form only when showForm = true */}
