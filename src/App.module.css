@@ -49,3 +49,34 @@
   transform: scale(1.1);
   box-shadow: 0 6px 28px rgba(255, 255, 255, 0.2);
 }
+
+.loading {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.error {
+  color: rgba(255, 80, 80, 0.8);
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.retryBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.retryBtn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
