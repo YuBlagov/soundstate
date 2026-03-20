@@ -43,7 +43,9 @@ function Wheel({ states, activeIds, onCardClick, rotation, onEdit, onDelete, ana
                 transform: `translate(-50%, -50%) rotate(${-rotation}deg)`,
                 zIndex: 10
             }}>
-                <ActiveState activeStates={activeStates} />
+                <ActiveState 
+                    activeStates={activeStates} 
+                    isPlaying={!!analyser?.current} />
             </div>
             {/* 6 cards around */}
             {states.map((state, index) => (

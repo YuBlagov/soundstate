@@ -42,7 +42,7 @@ function StateForm({ onSubmit, onCancel, initialData }) {
         });
     }
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={initialData ? 'Edit sound state' : 'Add new sound state'}>
             <div className={styles.form}>
                 <h2 className={styles.title}>
                     {initialData ? 'Edit State' : 'New State'}
@@ -144,15 +144,15 @@ function StateForm({ onSubmit, onCancel, initialData }) {
 
                 {/* actions */}
                 <div className={styles.actions}>
-                    <button className={styles.cancelBtn} onClick={onCancel}>
+                    <button className={styles.cancelBtn} onClick={onCancel} aria-label="Cancel editing sound state">
                         Cancel
                     </button>
-                    <button className={styles.submitBtn} onClick={handleSubmit}>
+                    <button className={styles.submitBtn} onClick={handleSubmit} aria-label={initialData ? 'Save changes to sound state' : 'Add new sound state'}>
                         {initialData ? 'Save' : 'Add'}
                     </button>
                 </div>
             </div>
-        </div>
+        </div>  
     )
 }
 

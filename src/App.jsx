@@ -59,6 +59,7 @@ function App() {
       <button 
         className={styles.addBtn}
         onClick={() => setShowForm(true)}
+        aria-label="Add new sound state"
         > + 
       </button>
 

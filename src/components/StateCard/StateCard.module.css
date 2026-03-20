@@ -27,6 +27,15 @@
   box-shadow: 0 0 25px var(--card-color), 0 0 60px var(--card-color);
 }
 
+.card:focus {
+  outline: 2px solid white;
+  outline-offset: 4px;
+}
+
+.card:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .name {
   font-size: 14px;
   font-weight: 700;
