@@ -1,86 +1,88 @@
 .container {
-    position: relative;
-    z-index: 10;
-    width: 160px;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: drop-shadow(0 0 20px var(--active-color));
-    transition: filter 0.6s ease;
-    cursor: pointer;
+  position: relative;
+  z-index: 10;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 20px var(--active-color));
+  transition: filter 0.6s ease;
+  cursor: pointer;
 }
 
 .ring {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 2px solid var(--active-color);
-    animation: 0.3; 
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--active-color);
+  /* REVIEW: `animation: 0.3` is invalid CSS — it needs a name and unit, e.g., `animation: ringPulse 0.3s`. As written, this property is ignored by the browser. Either remove it or fix it. */
+  animation: 0.3;
 }
 .ringActive {
-    animation: ringPulse 2s ease infinite;
+  animation: ringPulse 2s ease infinite;
 }
 
 .inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    background: color-mix(in srgb, var(--active-color) 15%, transparent);
-    /* color of active state */
-    border: 1px solid color-mix(in srgb, var(--active-color) 60%, transparent);
-    /* color of active state border */
-    border-radius: 50%;
-    width: 140px;
-    height: 140px;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-    transition: background 0.6s ease, border 0.6s ease;
-    /* smooth color change */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: color-mix(in srgb, var(--active-color) 15%, transparent);
+  /* color of active state */
+  border: 1px solid color-mix(in srgb, var(--active-color) 60%, transparent);
+  /* color of active state border */
+  border-radius: 50%;
+  width: 140px;
+  height: 140px;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  transition:
+    background 0.6s ease,
+    border 0.6s ease;
+  /* smooth color change */
 }
 
 .name {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: white;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: white;
 }
 
 .type {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: rgba(255, 255, 255, 0.5);
-    text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
 }
 
 @keyframes ringPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 0.8;
-    }
-
-    50% {
-        transform: scale(1.2);
-        opacity: 0.2;
-    }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.2;
+  }
 }
 
 @media (max-width: 600px) {
-    .container {
-        width: 110px;
-        height: 110px;
-    }
+  .container {
+    width: 110px;
+    height: 110px;
+  }
 
-    .inner {
-        width: 95px;
-        height: 95px;
-    }
+  .inner {
+    width: 95px;
+    height: 95px;
+  }
 
-    .name {
-        font-size: 11px;
-        letter-spacing: 2px;
-    }
+  .name {
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
 }
