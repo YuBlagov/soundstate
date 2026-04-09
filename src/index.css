@@ -7,7 +7,7 @@
 body {
   background: #0f0f0f;
   color: white;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   min-height: 100dvh;
 }
 
@@ -20,6 +20,7 @@ body {
   padding: 40px;
 }
 
+/* REVIEW: top, left, and transform have no effect without a position property (fixed/absolute/relative). These styles are dead — the actual positioning comes from App.module.css's .title class which has position:fixed. Either add `position: fixed` here or remove the positional properties. */
 h1 {
   top: 32px;
   left: 50%;

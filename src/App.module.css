@@ -1,3 +1,4 @@
+/* REVIEW: This .app class is in a CSS module, so it gets scoped (e.g., App_app__abc123). But in App.jsx, className="app" is used as a plain string, not styles.app. This means this rule never matches — the actual .app styling comes from index.css. Either use className={styles.app} in the JSX or move this rule to index.css. */
 .app {
   min-height: 100vh;
   display: flex;

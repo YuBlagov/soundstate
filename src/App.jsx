@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { fetchSoundStates } from './api/soundsApi';
-import Wheel from './components/Wheel/Wheel';
-import StateForm from './components/StateForm/StateForm';
-import useAudioEngine from './hooks/useAudioEngine';
-import styles from './App.module.css';
+import { useState, useEffect } from "react";
+import { fetchSoundStates } from "./api/soundsApi";
+import Wheel from "./components/Wheel/Wheel";
+import StateForm from "./components/StateForm/StateForm";
+import useAudioEngine from "./hooks/useAudioEngine";
+import styles from "./App.module.css";
 
 function App() {
   const [states, setStates] = useState([]);
@@ -18,20 +18,22 @@ function App() {
   useEffect(() => {
     const loadStates = async () => {
       try {
-        const data = await fetchSoundStates()
-        setStates(data)
-        setActiveIds([data[0].id])
-        setLoading(false)
+        const data = await fetchSoundStates();
+        setStates(data);
+        // REVIEW: data[0].id will throw a TypeError if the API returns an empty array. Add a guard: if (data.length > 0) setActiveIds([data[0].id])
+        setActiveIds([data[0].id]);
+        setLoading(false);
       } catch (err) {
-        setError(err.message)
-        setLoading(false)
+        setError(err.message);
+        setLoading(false);
       }
-    }
-    loadStates()
-  }, [])
+    };
+    loadStates();
+  }, []);
 
-  const activeStates = states.filter(state => activeIds.includes(state.id))
-  const audioState = (showForm || editState || isPaused) ? null : activeStates[0]
+  // REVIEW: activeIds is an array but only ever contains one ID. Consider simplifying to a single activeId value instead of an array, which would remove the need for .filter()/.includes() everywhere.
+  const activeStates = states.filter((state) => activeIds.includes(state.id));
+  const audioState = showForm || editState || isPaused ? null : activeStates[0];
 
   const analyser = useAudioEngine(audioState);
 
@@ -44,46 +46,58 @@ function App() {
     setIsPaused(false);
   };
 
+  // REVIEW: Uses `states` directly instead of the functional updater `prev => [...prev, newState]`. This can cause stale-state bugs if multiple rapid additions occur.
   const handleAdd = (newStateData) => {
     const newState = {
       ...newStateData, // spread the new state data
       id: Date.now(), // unique id
-    }
+    };
     setStates([...states, newState]);
     setShowForm(false);
-  }
+  };
 
   const handleEdit = (state) => {
     setEditState(state);
-  }
+  };
 
+  // REVIEW: No delete confirmation — clicking delete immediately removes the state with no way to undo. Consider adding a confirm dialog or undo toast.
   const handleDelete = (id) => {
-    setStates(states.filter(state => state.id !== id));
-  }
+    setStates(states.filter((state) => state.id !== id));
+  };
 
+  // REVIEW: Same stale-state concern — uses `states` and `editState` from closure instead of functional updater.
   const handleEditSubmit = (updatedData) => {
-    setStates(states.map(state =>
-      state.id === editState.id
-        ? { ...state, ...updatedData, id: editState.id }
-        : state
-    ));
+    setStates(
+      states.map((state) =>
+        state.id === editState.id
+          ? { ...state, ...updatedData, id: editState.id }
+          : state,
+      ),
+    );
     setEditState(null);
-  }
+  };
 
-  if (loading) return (
-    <div className="app">
-      <h1 className={styles.title}>SOUNDSTATE</h1>
-      <p className={styles.loading}>Loading sound states...</p>
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="app">
+        <h1 className={styles.title}>SOUNDSTATE</h1>
+        <p className={styles.loading}>Loading sound states...</p>
+      </div>
+    );
 
-  if (error) return (
-    <div className="app" role="alert">
-      <h1 className={styles.title}>SOUNDSTATE</h1>
-      <p className={styles.error}>Failed to load: {error}</p>
-      <button className={styles.retryBtn} onClick={() => window.location.reload()}>Retry</button>
-    </div>
-  )
+  if (error)
+    return (
+      <div className="app" role="alert">
+        <h1 className={styles.title}>SOUNDSTATE</h1>
+        <p className={styles.error}>Failed to load: {error}</p>
+        <button
+          className={styles.retryBtn}
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
 
   return (
     <div className="app">
@@ -94,7 +108,9 @@ function App() {
         className={styles.addBtn}
         onClick={() => setShowForm(true)}
         aria-label="Add new sound state"
-      > +
+      >
+        {" "}
+        +
       </button>
 
       <Wheel
@@ -106,7 +122,7 @@ function App() {
         onDelete={handleDelete}
         analyser={analyser}
         isPaused={isPaused}
-        onPause={() => setIsPaused(p => !p)}
+        onPause={() => setIsPaused((p) => !p)}
       />
 
       {/* show form only when showForm = true */}
@@ -127,7 +143,7 @@ function App() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
